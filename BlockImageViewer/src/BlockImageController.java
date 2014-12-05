@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 
+import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -16,7 +17,7 @@ public class BlockImageController {
 
 	private JFrame frame = new JFrame("BlockImage");
 	private JMenuBar menuBar = new JMenuBar();
-	// private JPanel topPane = new JPanel();
+	private JPanel topPane = new JPanel();
 	private JPanel imgPane = new JPanel();
 	private JPanel bottomPane = new JPanel();
 	private JLabel directory = new JLabel();
@@ -25,14 +26,17 @@ public class BlockImageController {
 		frame.setBounds(100, 100, 800, 550);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		// JButton chooseButton = new JButton("画像フォルダの選択");
-		// chooseButton.addActionListener(this);
+//		JButton chooseButton = new JButton("画像フォルダの選択");
+//		chooseButton.addActionListener(this);
+		topPane.setBackground(Color.WHITE);
+//		topPane.add(chooseButton);
+		
 
 		JMenu menu = new JMenu("Menu");
 		menuBar.add(menu);
-		JMenuItem openFolder = new JMenuItem("OpenFolder");
-		menu.add(openFolder);
-		openFolder.addActionListener(new ActionListener() {
+		JMenuItem openDir = new JMenuItem("OpenFolder");
+		menu.add(openDir);
+		openDir.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				JFileChooser filechooser = new JFileChooser();
 				filechooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
@@ -41,20 +45,29 @@ public class BlockImageController {
 					File file = filechooser.getSelectedFile();
 
 					directory.setText(file.toString());
-
+					SearchBlockImage sbi = new SearchBlockImage();
+					String[] ImgFiles = sbi.searchBlockImage(file);
 				}
 			}
 		});
+		JMenu tool = new JMenu("Tool");
+		menuBar.add(tool);
+		JMenuItem slider = new JMenuItem("Slider");
+		tool.add(slider);
+		slider.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				topPane.setVisible(!topPane.isVisible());
+				
+			}
+		});
 
-		// topPane.setBackground(Color.WHITE);
-		// topPane.add(chooseButton);
 
 		imgPane.setBackground(Color.black);
 
 		bottomPane.setBackground(Color.WHITE);
 		bottomPane.add(directory);
 
-		// frame.add(topPane, BorderLayout.PAGE_START);
+		frame.add(topPane, BorderLayout.PAGE_START);
 		frame.setJMenuBar(menuBar);
 		frame.add(imgPane, BorderLayout.CENTER);
 		frame.add(bottomPane, BorderLayout.PAGE_END);
