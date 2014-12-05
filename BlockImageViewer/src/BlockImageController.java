@@ -1,5 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -45,10 +46,13 @@ public class BlockImageController {
 
 		topPane.setBackground(Color.WHITE);// スライド用TopPanel
 		final JSlider imgSlider = new JSlider(0, 100, 0);// TopPanelにスライダー設置
+		imgSlider.setMajorTickSpacing(10);//目盛り大
+//		imgSlider.setMinorTickSpacing(1);//目盛り小
+		imgSlider.setPaintTicks(true);
+//    	imgSlider.setPreferredSize(new Dimension(1000, imgSlider.getHeight()));
 		topPane.add(imgSlider);
 		imgSlider.addChangeListener(new ChangeListener() {// スライダーの処理
 					public void stateChanged(ChangeEvent e) {
-						System.out.println(imgSlider.getValue());
 
 						if (!(imgFiles == null || imgFiles.size() == 0)) {// スライダ動かしたら画像変わる
 							imgLabel.setIcon(new ImageIcon(new File(
@@ -118,12 +122,43 @@ public class BlockImageController {
 
 		JMenu tool = new JMenu("Tool");// スライダーの表示，非表示を設定
 		menuBar.add(tool);
-		JMenuItem slider = new JMenuItem("Slider");
-		tool.add(slider);
-		slider.addActionListener(new ActionListener() {
+		JMenuItem visibleSlider = new JMenuItem("VisibleSlider");
+		tool.add(visibleSlider);
+		visibleSlider.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				topPane.setVisible(!topPane.isVisible());
 
+			}
+		});
+		JMenu sliderSize = new JMenu("SliderSize");
+		menuBar.add(sliderSize);
+		JMenuItem SSbig = new JMenuItem("Long");
+		sliderSize.add(SSbig);
+		SSbig.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+		    	imgSlider.setPreferredSize(new Dimension(1000, imgSlider.getHeight()));
+				imgSlider.revalidate();
+			}
+		});
+		JMenuItem SSmiddle = new JMenuItem("Middle");
+		sliderSize.add(SSmiddle);
+		SSmiddle.addActionListener(new ActionListener() {		
+			@Override
+			public void actionPerformed(ActionEvent e) {
+		    	imgSlider.setPreferredSize(new Dimension(500, imgSlider.getHeight()));
+				imgSlider.revalidate();
+			}
+		});
+		JMenuItem SSshort = new JMenuItem("short");
+		sliderSize.add(SSshort);
+		SSshort.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+		    	imgSlider.setPreferredSize(new Dimension(300, imgSlider.getHeight()));
+				imgSlider.revalidate();
 			}
 		});
 		
