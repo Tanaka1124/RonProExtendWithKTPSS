@@ -11,7 +11,6 @@ public class BlockImage {
 		initializeLookAndFeel();
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
-				// Create a new WorkspaceController
 				BlockImageController bic = new BlockImageController();
 				bic.createWindow();
 			}
