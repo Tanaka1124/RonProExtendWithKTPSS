@@ -10,7 +10,7 @@ public class BlockImage {
 		// TODO Auto-generated method stub
 		initializeLookAndFeel();
 		javax.swing.SwingUtilities.invokeLater(new Runnable() {
-			public void run() {
+			public void run() {//テスト用のrun
 				BlockImageController bic = new BlockImageController();
 				bic.createWindow();
 			}
