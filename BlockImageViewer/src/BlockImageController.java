@@ -1,9 +1,14 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -19,37 +24,39 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSlider;
+import javax.swing.JViewport;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 public class BlockImageController {
 
-	private JFrame frame = new JFrame("BlockImage");
+	private JFrame frame = new JFrame("BlockImageViewer");
 	private JMenuBar menuBar = new JMenuBar();
 	private JPanel topPane = new JPanel();
 	private JPanel imgPane = new JPanel();
 	private JPanel bottomPane = new JPanel();
 	private JLabel imgLabel = new JLabel();
 	private JLabel directory = new JLabel();
-	
+	private JScrollPane scrollpane = new JScrollPane();
+	private static final boolean HEAVYWEIGHT_LIGHTWEIGHT_MIXING = false;
+
 	private File selectedFile;
 	private List<String> imgFiles;
-
+	boolean canUpDownf = true;
 	String blockprintpath = "C:\\CRiPS\\RonproEditor\\testbase\\BlockPrint";
 
 	SearchBlockImage sbi = new SearchBlockImage();
+	Point temp;
 
 	void createWindow() {
 		frame.setBounds(100, 100, 800, 550);// ウインドウ生成
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-
-		topPane.setBackground(Color.WHITE);// スライド用TopPanel
 		final JSlider imgSlider = new JSlider(0, 100, 0);// TopPanelにスライダー設置
-		imgSlider.setMajorTickSpacing(10);//目盛り大
-//		imgSlider.setMinorTickSpacing(1);//目盛り小
+		imgSlider.setMajorTickSpacing(10);// 目盛り大
+		// imgSlider.setMinorTickSpacing(1);//目盛り小
 		imgSlider.setPaintTicks(true);
-//    	imgSlider.setPreferredSize(new Dimension(1000, imgSlider.getHeight()));
+
 		topPane.add(imgSlider);
 		imgSlider.addChangeListener(new ChangeListener() {// スライダーの処理
 					public void stateChanged(ChangeEvent e) {
@@ -59,11 +66,10 @@ public class BlockImageController {
 									selectedFile, imgFiles.get(imgSlider
 											.getValue())).getAbsolutePath()));
 						}
-						// repaint();
 					}
 				});
 
-		JButton back = new JButton("←");//戻るボタン
+		JButton back = new JButton("←");// 戻るボタン
 		topPane.add(back);
 		back.addActionListener(new ActionListener() {
 
@@ -79,7 +85,7 @@ public class BlockImageController {
 			}
 		});
 
-		JButton go = new JButton("→");//進むボタン
+		JButton go = new JButton("→");// 進むボタン
 		topPane.add(go);
 		go.addActionListener(new ActionListener() {
 
@@ -100,14 +106,14 @@ public class BlockImageController {
 		JMenuItem openDir = new JMenuItem("OpenFolder");
 		menu.add(openDir);
 		openDir.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {//ディレクトリ指定
+			public void actionPerformed(ActionEvent e) {// ディレクトリ指定
 				JFileChooser filechooser = new JFileChooser(blockprintpath);
 				filechooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 				int selected = filechooser.showOpenDialog(frame);
 				if (selected == JFileChooser.APPROVE_OPTION) {
 					selectedFile = filechooser.getSelectedFile();// chooser
 
-					directory.setText(selectedFile.toString());//bottomに書き込み
+					directory.setText(selectedFile.toString() + "　内の画像を表示");// bottomに書き込み
 
 					imgFiles = Arrays.asList(sbi.searchBlockImage(selectedFile));// イメージを探す
 					if (!(imgFiles == null || imgFiles.size() == 0)) {// 画像ファイルが見つかったか判定
@@ -115,6 +121,8 @@ public class BlockImageController {
 						imgSlider.setValue(0);
 						imgLabel.setIcon(new ImageIcon(new File(selectedFile,
 								imgFiles.get(0)).getAbsolutePath()));// 最初の画像を表示
+					} else {
+						directory.setText("ファイル内に　.jpg　.png　のファイルが見つかりませんでした");// エラーメッセージ
 					}
 				}
 			}
@@ -130,49 +138,103 @@ public class BlockImageController {
 
 			}
 		});
-		JMenu sliderSize = new JMenu("SliderSize");
+		JMenu sliderSize = new JMenu("SliderSize");// スライドのサイズ変更
 		menuBar.add(sliderSize);
 		JMenuItem SSbig = new JMenuItem("Long");
 		sliderSize.add(SSbig);
 		SSbig.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-		    	imgSlider.setPreferredSize(new Dimension(1000, imgSlider.getHeight()));
-				imgSlider.revalidate();
+				imgSlider.setPreferredSize(new Dimension(1000, imgSlider
+						.getHeight()));
+				imgSlider.revalidate();// 再描画
 			}
 		});
 		JMenuItem SSmiddle = new JMenuItem("Middle");
 		sliderSize.add(SSmiddle);
-		SSmiddle.addActionListener(new ActionListener() {		
+		SSmiddle.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-		    	imgSlider.setPreferredSize(new Dimension(500, imgSlider.getHeight()));
+				imgSlider.setPreferredSize(new Dimension(500, imgSlider
+						.getHeight()));
 				imgSlider.revalidate();
 			}
 		});
 		JMenuItem SSshort = new JMenuItem("short");
 		sliderSize.add(SSshort);
 		SSshort.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent e) {
-		    	imgSlider.setPreferredSize(new Dimension(300, imgSlider.getHeight()));
+				imgSlider.setPreferredSize(new Dimension(300, imgSlider
+						.getHeight()));
 				imgSlider.revalidate();
 			}
 		});
+		JMenu DDM = new JMenu("Drag&DropMode");
+		menuBar.add(DDM);
+		JMenuItem canODD = new JMenuItem("CanOverDrag&Drop");
+		DDM.add(canODD);
+		canODD.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				canUpDownf = false;
+				
+			}
+		});
+		JMenuItem canNODD = new JMenuItem("CanNOTOverDrag&Drop");
+		DDM.add(canNODD);
+		canNODD.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				canUpDownf = true;
+				
+			}
+		});
 		
-		imgPane.setBackground(Color.black);// img用パネル
-		imgLabel.setHorizontalTextPosition(JLabel.LEFT);
-	    imgLabel.setVerticalTextPosition(JLabel.BOTTOM);
-	    imgPane.setLayout(new FlowLayout(FlowLayout.LEFT));
-		imgPane.add(imgLabel);
+		JViewport imgView = new JViewport() {// ドラッグアンドドロップでの移動の実装
 
-		
-		JScrollPane scrollpane = new JScrollPane(imgPane);
-		
+			private static final long serialVersionUID = 1L;
+			private boolean flag;
 
-		bottomPane.setBackground(Color.WHITE);// Bottomパネル（いるか不明）
+			@Override
+			public void revalidate() {
+				if (!HEAVYWEIGHT_LIGHTWEIGHT_MIXING && flag) {
+					return;
+				}
+				super.revalidate();
+			}
+
+			@Override
+			public void setViewPosition(Point p) {
+				if (HEAVYWEIGHT_LIGHTWEIGHT_MIXING) {
+					super.setViewPosition(p);
+				} else {
+					flag = true;
+					super.setViewPosition(p);
+					flag = false;
+				}
+			}
+		};
+
+		imgView.add(imgLabel);
+
+		MouseAdapter hsl1 = new HandScrollListener();
+		imgView.addMouseMotionListener(hsl1);
+		imgView.addMouseListener(hsl1);
+
+		scrollpane.setViewport(imgView);// スクロールパネルにimgpanelを貼り付け
+		scrollpane.getViewport().setBackground(Color.BLACK);
+		scrollpane.getViewport().setLayout(new FlowLayout(FlowLayout.LEFT));
+		// imgPane.setBackground(Color.black);
+		// imgPane.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+		imgPane.add(scrollpane);
+
+		bottomPane.setBackground(Color.WHITE);// Bottomパネル（いるか不明ｗｗｗｗｗ）
 		bottomPane.setLayout(new FlowLayout(FlowLayout.LEFT));
 		bottomPane.add(directory);
 
@@ -184,4 +246,38 @@ public class BlockImageController {
 		frame.setVisible(true);
 	}
 
+	class HandScrollListener extends MouseAdapter {// ドラッグアンドドロップでの移動の実装
+		private final Cursor defCursor = Cursor
+				.getPredefinedCursor(Cursor.DEFAULT_CURSOR);
+		private final Cursor hndCursor = Cursor
+				.getPredefinedCursor(Cursor.HAND_CURSOR);
+		private final Point pp = new Point();
+
+		@Override
+		public void mouseDragged(MouseEvent e) {
+			JViewport vport = (JViewport) e.getComponent();
+			Point cp = e.getPoint();
+			Point vp = vport.getViewPosition(); // =
+												// SwingUtilities.convertPoint(vport,
+												// 0, 0, label);
+			vp.translate(pp.x - cp.x, pp.y - cp.y);
+			if (canUpDownf) {
+				imgLabel.scrollRectToVisible(new Rectangle(vp, vport.getSize()));
+			} else {
+				vport.setViewPosition(vp);
+			}
+			pp.setLocation(cp);
+		}
+
+		@Override
+		public void mousePressed(MouseEvent e) {
+			e.getComponent().setCursor(hndCursor);
+			pp.setLocation(e.getPoint());
+		}
+
+		@Override
+		public void mouseReleased(MouseEvent e) {
+			e.getComponent().setCursor(defCursor);
+		}
+	}
 }
