@@ -33,7 +33,6 @@ public class BlockImageController {
 	private JFrame frame = new JFrame("BlockImageViewer");
 	private JMenuBar menuBar = new JMenuBar();
 	private JPanel topPane = new JPanel();
-	private JPanel imgPane = new JPanel();
 	private JPanel bottomPane = new JPanel();
 	private JLabel imgLabel = new JLabel();
 	private JLabel directory = new JLabel();
@@ -177,24 +176,24 @@ public class BlockImageController {
 		JMenuItem canODD = new JMenuItem("CanOverDrag&Drop");
 		DDM.add(canODD);
 		canODD.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				canUpDownf = false;
-				
+
 			}
 		});
 		JMenuItem canNODD = new JMenuItem("CanNOTOverDrag&Drop");
 		DDM.add(canNODD);
 		canNODD.addActionListener(new ActionListener() {
-			
+
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				canUpDownf = true;
-				
+
 			}
 		});
-		
+
 		JViewport imgView = new JViewport() {// ドラッグアンドドロップでの移動の実装
 
 			private static final long serialVersionUID = 1L;
@@ -220,19 +219,18 @@ public class BlockImageController {
 			}
 		};
 
-		imgView.add(imgLabel);
+		// imgLabel.setPreferredSize(new Dimension(5000,
+		// 5000));//最初に画面サイズを決めちゃう的なやつ
+		imgLabel.setVerticalAlignment(JLabel.TOP);
+		imgLabel.setHorizontalAlignment(JLabel.LEFT);
 
 		MouseAdapter hsl1 = new HandScrollListener();
+		imgView.add(imgLabel, BorderLayout.NORTH);
 		imgView.addMouseMotionListener(hsl1);
 		imgView.addMouseListener(hsl1);
 
 		scrollpane.setViewport(imgView);// スクロールパネルにimgpanelを貼り付け
 		scrollpane.getViewport().setBackground(Color.BLACK);
-		scrollpane.getViewport().setLayout(new FlowLayout(FlowLayout.LEFT));
-		// imgPane.setBackground(Color.black);
-		// imgPane.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-		imgPane.add(scrollpane);
 
 		bottomPane.setBackground(Color.WHITE);// Bottomパネル（いるか不明ｗｗｗｗｗ）
 		bottomPane.setLayout(new FlowLayout(FlowLayout.LEFT));
